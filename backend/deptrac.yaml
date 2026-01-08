@@ -1,0 +1,84 @@
+deptrac:
+    paths:
+        - src
+    exclude_files:
+        - '#/Tests/#'
+
+    layers:
+        -   name: ExternalLib
+            collectors:
+              - type: composer
+                composerPath: composer.json
+                composerLockPath: composer.lock
+                packages:
+                    - symfony/framework-bundle
+                    - symfony/http-foundation
+                    - symfony/http-kernel
+                    - symfony/uid
+                    - symfony/security-core
+                    - symfony/security-bundle
+                    - symfony/dependency-injection
+                    - doctrine/orm
+                    - doctrine/dbal
+                    - doctrine/doctrine-bundle
+                    - doctrine/persistence
+                    - psr/log
+                    - lexik/jwt-authentication-bundle
+                    - symfony/doctrine-bridge
+                    - symfony/event-dispatcher
+
+        - name: Common
+          collectors:
+              - type: classNameRegex
+                value: '#^Keystone\\Common\\#'
+
+        - name: Domain
+          collectors:
+              - type: classNameRegex
+                value: '#^Keystone\\(?!Common\\).+\\Domain\\#'
+
+        - name: Application
+          collectors:
+              - type: classNameRegex
+                value: '#^Keystone\\(?!Common\\).+\\Application\\#'
+
+        - name: Infrastructure
+          collectors:
+              - type: classNameRegex
+                value: '#^Keystone\\(?!Common\\).+\\Infrastructure\\#'
+        - name: UIController
+          collectors:
+              - type: classNameRegex
+                value: '#^Keystone\\Controller\\#'
+        - name: Enum
+          collectors:
+              -   type: classNameRegex
+                  value: '#^Keystone\\Domain\\.*Enum\\#'
+              -   type: classNameRegex
+                  value: '#^Keystone\\Application\\.*Enum\\#'
+
+    ruleset:
+        ExternalLib: ~
+        Common:
+            - ExternalLib
+        Enum:
+            - ExternalLib
+        Domain:
+            - ExternalLib
+            - Common
+            - Enum
+        Application:
+            - Domain
+            - Common
+            - ExternalLib
+            - Enum
+        Infrastructure:
+            - Application
+            - Domain
+            - Common
+            - ExternalLib
+            - Enum
+        UIController:
+            - ExternalLib
+            - Application
+            - Common

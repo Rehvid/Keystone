@@ -1,0 +1,24 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "plugins": [
+            {
+                "name": "next"
+            }
+        ],
+        "baseUrl": "../../",
+        "paths": {
+            "@assets/*": ["apps/shop/src/assets/*"],
+            "@components/*": ["apps/shop/src/components/*"],
+            "@config/*": ["apps/shop/src/config/*"],
+            "@features/*": ["apps/shop/src/features/*"],
+            "@hooks/*": ["apps/shop/src/hooks/*"],
+            "@lib/*": ["apps/shop/src/lib/*"],
+            "@locales/*": ["apps/shop/src/locales/*"],
+            "@utils/*": ["apps/shop/src/utils/*"],
+            "@ui/*": ["packages/ui/src/*"],
+            "@core/*": ["packages/core/src/*"]
+        }
+    },
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"]
+}

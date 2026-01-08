@@ -1,0 +1,2 @@
+api_admin_login:
+    path: /api/v1/security/login

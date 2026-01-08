@@ -1,0 +1,30 @@
+{
+    "name": "@keystone/workspace",
+    "description": "Keystone project monorepo featuring shop and admin applications",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "pnpm -r --parallel dev",
+        "build": "pnpm -r build",
+        "start": "pnpm -r start",
+        "lint": "pnpm -r --aggregate-output --reporter append-only lint",
+        "lint-fix": "pnpm -r --stream lint:fix",
+        "prettier-format": "prettier --write \"{apps,packages}/**/*.{ts,tsx,js,json,yaml,md}\""
+    },
+    "devDependencies": {
+        "@eslint/eslintrc": "^3",
+        "@eslint/js": "^9.35.0",
+        "@tailwindcss/postcss": "^4",
+        "@types/node": "^20",
+        "eslint": "^9",
+        "eslint-formatter-pretty": "^7.0.0",
+        "eslint-import-resolver-typescript": "^4.4.4",
+        "eslint-plugin-prettier": "^5.5.4",
+        "globals": "^16.4.0",
+        "pnpm": "^9.4.0",
+        "prettier": "3.6.2",
+        "tailwindcss": "^4",
+        "typescript": "^5"
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "compilerOptions": {
+        "target": "ES2024",
+        "lib": ["dom", "dom.iterable", "esnext"],
+        "allowJs": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "module": "ESNext", // modules
+        "moduleResolution": "Node",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "resolveJsonModule": true,
+        "noEmit": true, // build
+        "incremental": true,
+        "isolatedModules": true,
+        "jsx": "react-jsx",
+        "baseUrl": ".",
+        "paths": {
+            "@shop/eslint-config": ["packages/eslint-config"],
+            "@ui/*": ["packages/ui/src/*"],
+            "@core/*": ["packages/core/src/*"]
+        },
+        "plugins": [
+            {
+                "name": "next"
+            }
+        ]
+    },
+    "exclude": ["node_modules"]
+}
