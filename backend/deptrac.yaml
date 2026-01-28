@@ -17,6 +17,9 @@ deptrac:
                     - symfony/uid
                     - symfony/security-core
                     - symfony/security-bundle
+                    - symfony/security-http
+                    - symfony/routing
+                    - symfony/password-hasher
                     - symfony/dependency-injection
                     - doctrine/orm
                     - doctrine/dbal
