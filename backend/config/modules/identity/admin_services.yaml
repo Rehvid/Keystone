@@ -1,0 +1,48 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+    keystone.identity.admin.security.jwt_cookie.payload_configuration:
+        class: Keystone\Shared\Domain\ValueObject\CookieConfiguration
+        arguments:
+            $name: '%env(string:JWT_ADMIN_PAYLOAD_COOKIE_NAME)%'
+            $path: '%env(string:JWT_ADMIN_PAYLOAD_COOKIE_PATH)%'
+            $isSecure: '%env(bool:JWT_ADMIN_PAYLOAD_COOKIE_IS_SECURE)%'
+            $httpOnly: '%env(bool:JWT_ADMIN_PAYLOAD_COOKIE_HTTP_ONLY)%'
+            $sameSite: '%env(string:JWT_ADMIN_PAYLOAD_COOKIE_SAME_SITE)%'
+
+    keystone.identity.admin.security.jwt_cookie.signature_configuration:
+        class: Keystone\Shared\Domain\ValueObject\CookieConfiguration
+        arguments:
+            $name: '%env(string:JWT_ADMIN_SIGNATURE_COOKIE_NAME)%'
+            $path: '%env(string:JWT_ADMIN_SIGNATURE_COOKIE_PATH)%'
+            $isSecure: '%env(bool:JWT_ADMIN_SIGNATURE_COOKIE_IS_SECURE)%'
+            $httpOnly: '%env(bool:JWT_ADMIN_SIGNATURE_COOKIE_HTTP_ONLY)%'
+            $sameSite: '%env(string:JWT_ADMIN_SIGNATURE_COOKIE_SAME_SITE)%'
+
+    keystone.identity.admin.security.jwt_cookie.factory:
+        class: Keystone\Identity\Common\Infrastructure\Security\JWT\Cookie\Factory\JwtCookieFactory
+        arguments:
+            $payloadConfiguration: '@keystone.identity.admin.security.jwt_cookie.payload_configuration'
+            $signatureConfiguration: '@keystone.identity.admin.security.jwt_cookie.signature_configuration'
+
+    keystone.identity.admin.security.jwt_cookie.extractor_configuration:
+        class: Keystone\Identity\Common\Domain\ValueObject\TokenExtractorConfiguration
+        arguments:
+            $payloadCookieName: '%env(string:JWT_ADMIN_PAYLOAD_COOKIE_NAME)%'
+            $signatureCookieName: '%env(string:JWT_ADMIN_SIGNATURE_COOKIE_NAME)%'
+
+    keystone.identity.admin.security.jwt_cookie.token_extractor:
+        class: Keystone\Identity\Common\Infrastructure\Security\JWT\Cookie\Extractor\JWTCookieTokenExtractor
+        arguments:
+            $configuration: '@keystone.identity.admin.security.jwt_cookie.extractor_configuration'
+
+    keystone.identity.admin.security.jwt_cookie.authenticator:
+        parent: lexik_jwt_authentication.security.jwt_authenticator
+        arguments:
+            $tokenExtractor: '@keystone.identity.admin.security.jwt_cookie.token_extractor'
+
+    keystone.identity.admin.security.jwt_cookie.authentication_success_handler:
+        class: Keystone\Identity\User\Infrastructure\Security\JWT\JWTCookieAuthenticationSuccessHandler
+        arguments:
+            $jwtCookieFactory: '@keystone.identity.admin.security.jwt_cookie.factory'
