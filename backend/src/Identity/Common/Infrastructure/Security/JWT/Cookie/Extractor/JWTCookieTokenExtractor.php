@@ -15,13 +15,13 @@ final readonly class JWTCookieTokenExtractor implements TokenExtractorInterface
     ) {
     }
 
-    public function extract(Request $request): ?string
+    public function extract(Request $request): string
     {
         $payload = $request->cookies->get($this->configuration->getPayloadCookieName());
         $signature = $request->cookies->get($this->configuration->getSignatureCookieName());
 
         if (!$payload || !$signature) {
-            return null;
+            return '';
         }
 
         return sprintf('%s.%s', $payload, $signature);
