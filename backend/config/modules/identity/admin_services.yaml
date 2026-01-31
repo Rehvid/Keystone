@@ -5,7 +5,7 @@ services:
     keystone.identity.admin.security.jwt_cookie.payload_configuration:
         class: Keystone\Shared\Domain\ValueObject\CookieConfiguration
         arguments:
-            $name: '%env(string:JWT_ADMIN_PAYLOAD_COOKIE_NAME)%'
+            $name: '%identity.admin.jwt_cookie_payload_name%'
             $path: '%env(string:JWT_ADMIN_PAYLOAD_COOKIE_PATH)%'
             $isSecure: '%env(bool:JWT_ADMIN_PAYLOAD_COOKIE_IS_SECURE)%'
             $httpOnly: '%env(bool:JWT_ADMIN_PAYLOAD_COOKIE_HTTP_ONLY)%'
@@ -14,7 +14,7 @@ services:
     keystone.identity.admin.security.jwt_cookie.signature_configuration:
         class: Keystone\Shared\Domain\ValueObject\CookieConfiguration
         arguments:
-            $name: '%env(string:JWT_ADMIN_SIGNATURE_COOKIE_NAME)%'
+            $name: '%identity.admin.jwt_cookie_signature_name%'
             $path: '%env(string:JWT_ADMIN_SIGNATURE_COOKIE_PATH)%'
             $isSecure: '%env(bool:JWT_ADMIN_SIGNATURE_COOKIE_IS_SECURE)%'
             $httpOnly: '%env(bool:JWT_ADMIN_SIGNATURE_COOKIE_HTTP_ONLY)%'

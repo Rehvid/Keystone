@@ -1,0 +1,4 @@
+imports:
+    - { resource: 'modules/identity/parameters.yaml' }
+
+parameters:

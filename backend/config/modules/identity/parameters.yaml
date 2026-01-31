@@ -1,0 +1,3 @@
+parameters:
+    identity.admin.jwt_cookie_payload_name: '%env(string:JWT_ADMIN_PAYLOAD_COOKIE_NAME)%'
+    identity.admin.jwt_cookie_signature_name: '%env(string:JWT_ADMIN_SIGNATURE_COOKIE_NAME)%'
