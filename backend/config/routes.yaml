@@ -1,2 +1,8 @@
 api_admin_token:
     path: /api/v1/security/token
+
+api_admin:
+    resource: '../src/UI/Admin/Controller/'
+    type: attribute
+    prefix: /api/v1/admin
+    name_prefix: api_v1_admin_
