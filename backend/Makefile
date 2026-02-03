@@ -31,7 +31,7 @@ cache-clear: ## Clear Symfony cache
 # ---- Libraries ----
 
 openapi-generate: ## Generate OpenAPI documentation from attributes
-	$(DC_EXEC) vendor/bin/openapi -o openapi.yaml src
+	$(DC_EXEC) bin/console nelmio:apidoc:dump --format=yaml > openapi.yaml
 
 jwt-generate: ## Generate JWT (LexikJWTBundle) keys
 	$(DC_EXEC) php bin/console lexik:jwt:generate-keypair --overwrite --no-interaction

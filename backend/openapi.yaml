@@ -1,0 +1,239 @@
+openapi: 3.0.0
+info:
+  title: 'Keystone E-commerce API'
+  description: 'REST API for Keystone e-commerce platform (DDD architecture)'
+  version: 1.0.0
+servers:
+  -
+    url: 'http://localhost:8000'
+    description: Development
+paths:
+  /api/v1/security/token:
+    post:
+      tags:
+        - 'Admin / Identity'
+      summary: Login
+      description: "Authenticates user using email and password.\n\nSets two httpOnly cookies:\n- `ADMIN_KEYSTONE_JWT_PAYLOAD` - JWT payload (contains user info)\n- `ADMIN_KEYSTONE_JWT_SIGNATURE` - JWT signature (for verification)\n"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  description: 'Admin email address'
+                  type: string
+                  format: email
+                  example: admin@example.com
+                password:
+                  description: 'Admin password'
+                  type: string
+                  format: password
+                  example: secret123
+              type: object
+      responses:
+        '200':
+          description: 'Successfully authenticated'
+          headers:
+            Set-Cookie:
+              description: 'JWT authentication cookies'
+              schema:
+                type: array
+                items:
+                  type: string
+                example:
+                  - ADMIN_KEYSTONE_JWT_PAYLOAD
+                  - ADMIN_KEYSTONE_JWT_SIGNATURE
+          content:
+            application/json:
+              schema:
+                properties:
+                  status: { type: string, enum: [SUCCESS, SUCCESS_EMPTY, ERROR], example: SUCCESS_EMPTY }
+                  meta: { $ref: '#/components/schemas/AppMeta' }
+                type: object
+        '401':
+          $ref: '#/components/responses/AdminUnauthorized'
+  /api/v1/admin/users/logout:
+    post:
+      tags:
+        - 'Admin / Identity'
+      summary: 'Logout user'
+      description: 'Clears authentication cookies and logs out the user'
+      operationId: post_api_v1_admin_users_logout
+      responses:
+        '200':
+          description: 'Successfully logged out'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppPayload'
+              example:
+                status: SUCCESS_EMPTY
+                meta:
+                  timestamp: '2026-02-03T12:00:00+01:00'
+                  requestId: 019c2173-9dbc-7c6d-b244-d29699fd595e
+        '401':
+          $ref: '#/components/responses/AdminUnauthorized'
+      security:
+        -
+          adminJwtCookiePayload: []
+          adminJwtCookieSignature: []
+components:
+  schemas:
+    StatusPayload:
+      type: string
+      enum:
+        - SUCCESS
+        - SUCCESS_EMPTY
+        - ERROR
+    AppMeta:
+      required:
+        - requestId
+        - timestamp
+      properties:
+        requestId:
+          description: 'Unique request identifier'
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        timestamp:
+          description: 'Timestamp of the request in ISO 8601 format'
+          type: string
+          example: '2026-02-01T12:34:56Z'
+      type: object
+    ErrorDetail:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          description: 'Unique error code'
+          type: string
+          example: VALIDATION_ERROR
+        message:
+          description: 'Human-readable error message'
+          type: string
+          example: 'The email field is required'
+        path:
+          description: 'Path to the field that caused the error'
+          type: string
+          default: null
+          example: user.email
+          nullable: true
+        details:
+          description: 'Additional error details'
+          type: object
+          default: []
+          example:
+            field: email
+            constraint: required
+          additionalProperties: {  }
+      type: object
+    ErrorPayload:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          description: 'Main error code'
+          type: string
+          example: AUTH_INVALID_CREDENTIALS
+        message:
+          description: 'Main error message'
+          type: string
+          example: 'Request validation failed'
+        details:
+          description: 'Detailed list of validation errors'
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+          default: []
+      type: object
+    AppPayload:
+      required:
+        - status
+        - metaPayload
+        - meta
+      properties:
+        status:
+          $ref: '#/components/schemas/StatusPayload'
+        metaPayload:
+          $ref: '#/components/schemas/AppMeta'
+        data:
+          description: 'The actual response data'
+          type: object
+          default: null
+          nullable: true
+        errorPayload:
+          oneOf:
+            -
+              $ref: '#/components/schemas/ErrorPayload'
+          nullable: true
+          default: null
+      type: object
+  responses:
+    AdminUnauthorized:
+      description: 'Authentication errors related to JWT authorization'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AppPayload'
+          examples:
+            MissingToken:
+              summary: 'The request does not contain a JWT authentication token.'
+              value:
+                status: ERROR
+                meta:
+                  timestamp: '2026-02-03T12:00:00+01:00'
+                  requestId: 019c2173-9dbc-7c6d-b244-d29699fd595e
+                error:
+                  code: AUTH_JWT_MISSING_TOKEN
+                  message: 'Authentication token is missing. Please log in.'
+            ExpiredToken:
+              summary: 'The provided JWT token has expired and is no longer valid.'
+              value:
+                status: ERROR
+                meta:
+                  timestamp: '2026-02-03T12:00:00+01:00'
+                  requestId: 019c2173-9dbc-7c6d-b244-d29699fd595e
+                error:
+                  code: AUTH_JWT_EXPIRED_TOKEN
+                  message: 'Your session has expired. Please log in again.'
+            InvalidCredentials:
+              summary: 'The provided authentication credentials are incorrect.'
+              value:
+                status: ERROR
+                meta:
+                  timestamp: '2026-02-03T12:00:00+01:00'
+                  requestId: 019c2173-9dbc-7c6d-b244-d29699fd595e
+                error:
+                  code: AUTH_INVALID_CREDENTIALS
+                  message: 'Invalid credentials.'
+            InvalidToken:
+              summary: 'The provided JWT token is malformed, invalid, or cannot be verified.'
+              value:
+                status: ERROR
+                meta:
+                  timestamp: '2026-02-03T12:00:00+01:00'
+                  requestId: 019c2173-9dbc-7c6d-b244-d29699fd595e
+                error:
+                  code: AUTH_JWT_INVALID_TOKEN
+                  message: 'The provided token is invalid. Please log in again.'
+  securitySchemes:
+    adminJwtCookiePayload:
+      type: apiKey
+      description: 'Admin panel JWT payload cookie (part 1/2 of dual-cookie auth)'
+      name: ADMIN_KEYSTONE_JWT_PAYLOAD
+      in: cookie
+    adminJwtCookieSignature:
+      type: apiKey
+      description: 'Admin panel JWT signature cookie (part 2/2 of dual-cookie auth)'
+      name: ADMIN_KEYSTONE_JWT_SIGNATURE
+      in: cookie
+tags:
+  -
+    name: 'Admin / Identity'
+    description: 'Authentication and identity management for admin users'
+

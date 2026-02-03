@@ -1,0 +1,136 @@
+nelmio_api_doc:
+    documentation:
+        tags:
+            -   name: Admin / Identity
+                description: Authentication and identity management for admin users
+        info:
+            title: Keystone E-commerce API
+            description: REST API for Keystone e-commerce platform (DDD architecture)
+            version: 1.0.0
+        servers:
+            - url: http://localhost:8000
+              description: Development
+        components:
+            securitySchemes:
+                adminJwtCookiePayload:
+                    type: apiKey
+                    in: cookie
+                    name: '%identity.admin.jwt_cookie_payload_name%'
+                    description: Admin panel JWT payload cookie (part 1/2 of dual-cookie auth)
+                adminJwtCookieSignature:
+                    type: apiKey
+                    in: cookie
+                    name: '%identity.admin.jwt_cookie_signature_name%'
+                    description: Admin panel JWT signature cookie (part 2/2 of dual-cookie auth)
+            responses:
+                AdminUnauthorized:
+                    description: "Authentication errors related to JWT authorization"
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AppPayload'
+                            examples:
+                                MissingToken:
+                                    summary: "The request does not contain a JWT authentication token."
+                                    value:
+                                        status: "ERROR"
+                                        meta: {
+                                            timestamp: "2026-02-03T12:00:00+01:00",
+                                            requestId: "019c2173-9dbc-7c6d-b244-d29699fd595e"
+                                        }
+                                        error:
+                                            code: "AUTH_JWT_MISSING_TOKEN"
+                                            message: "Authentication token is missing. Please log in."
+                                ExpiredToken:
+                                    summary: "The provided JWT token has expired and is no longer valid."
+                                    value:
+                                        status: "ERROR"
+                                        meta: {
+                                            timestamp: "2026-02-03T12:00:00+01:00",
+                                            requestId: "019c2173-9dbc-7c6d-b244-d29699fd595e"
+                                        }
+                                        error:
+                                            code: "AUTH_JWT_EXPIRED_TOKEN"
+                                            message: "Your session has expired. Please log in again."
+                                InvalidCredentials:
+                                    summary: "The provided authentication credentials are incorrect."
+                                    value:
+                                        status: "ERROR"
+                                        meta: {
+                                            timestamp: "2026-02-03T12:00:00+01:00",
+                                            requestId: "019c2173-9dbc-7c6d-b244-d29699fd595e"
+                                        }
+                                        error:
+                                            code: "AUTH_INVALID_CREDENTIALS"
+                                            message: "Invalid credentials."
+                                InvalidToken:
+                                    summary: "The provided JWT token is malformed, invalid, or cannot be verified."
+                                    value:
+                                        status: 'ERROR'
+                                        meta: {
+                                            timestamp: "2026-02-03T12:00:00+01:00",
+                                            requestId: "019c2173-9dbc-7c6d-b244-d29699fd595e"
+                                        }
+                                        error:
+                                            code: "AUTH_JWT_INVALID_TOKEN"
+                                            message: "The provided token is invalid. Please log in again."
+
+        paths:
+            /api/v1/security/token:
+                post:
+                    tags: [Admin / Identity]
+                    summary: Login
+                    description:  |
+                        Authenticates user using email and password.
+
+                        Sets two httpOnly cookies:
+                        - `%identity.admin.jwt_cookie_payload_name%` - JWT payload (contains user info)
+                        - `%identity.admin.jwt_cookie_signature_name%` - JWT signature (for verification)
+                    requestBody:
+                        required: true
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    required: [ email, password ]
+                                    properties:
+                                        email:
+                                            type: string
+                                            format: email
+                                            example: admin@example.com
+                                            description: Admin email address
+                                        password:
+                                            type: string
+                                            format: password
+                                            example: secret123
+                                            description: Admin password
+                    responses:
+                        '200':
+                            description: Successfully authenticated
+                            headers:
+                                Set-Cookie:
+                                    description: JWT authentication cookies
+                                    schema:
+                                        type: array
+                                        items:
+                                            type: string
+                                        example:
+                                            - "%identity.admin.jwt_cookie_payload_name%"
+                                            - "%identity.admin.jwt_cookie_signature_name%"
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            status:
+                                                type: string
+                                                enum: [ SUCCESS, SUCCESS_EMPTY, ERROR ]
+                                                example: SUCCESS_EMPTY
+                                            meta:
+                                                $ref: '#/components/schemas/AppMeta'
+                        '401':
+                            $ref: '#/components/responses/AdminUnauthorized'
+
+    areas:
+        default:
+            path_patterns: [ ^/api(?!/doc$) ]
