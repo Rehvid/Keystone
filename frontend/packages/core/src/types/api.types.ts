@@ -26,5 +26,5 @@ export interface AppPayload<TData = any, TMeta extends BaseMeta = BaseMeta> {
     status: StatusPayload;
     meta: TMeta;
     data?: TData | null;
-    errorPayload?: ErrorPayload | null;
+    error?: ErrorPayload | null;
 }
