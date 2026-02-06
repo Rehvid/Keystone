@@ -13,7 +13,7 @@ export class ApiError<TMeta extends BaseMeta = BaseMeta> extends Error {
         public readonly payload: AppPayload<any, TMeta>,
         public readonly status: number,
     ) {
-        super(payload.errorPayload?.message || 'API Error');
+        super(payload.error?.message || 'API Error');
         this.name = 'ApiError';
     }
 }
